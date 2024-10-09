@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
-interface Car {
+export interface Car {
   id: number;
   brand: string;
   model: string;
@@ -57,7 +57,7 @@ export default function TabOneScreen() {
       {error ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
-          <Text>Prawdopodobnie to nasza wina 😥</Text>
+          <Text>Sprawdź swoje połączenie z internetem... 😥</Text>
         </View>
       ) : null}
     </View>
