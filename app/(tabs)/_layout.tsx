@@ -30,6 +30,20 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        headerRight: () => (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Pressable onPress={changeTheme}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
+                  size={25}
+                  color={Colors[colorScheme ?? 'light'].text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          </View>
+        ),
       }}>
       <Tabs.Screen
         name="index"
