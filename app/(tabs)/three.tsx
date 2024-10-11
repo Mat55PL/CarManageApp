@@ -3,34 +3,8 @@ import { Car } from "@/app/(tabs)/index";
 import { FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { getAllCars } from "../API/apiService";
-
-
-const cars: Car[] = [
-    {
-        id: 1,
-        brand: 'Audi',
-        model: 'A4',
-        vin: 'WAUZZZ8K0BA123456',
-        year: 2011,
-        fuelType: 1,
-        wheelType: 1,
-        numberPlate: "RLA7948"
-    },
-    {
-        id: 2,
-        brand: 'Opel',
-        model: 'Astra',
-        vin: 'W0L0SDL08C1234567',
-        year: 2018,
-        fuelType: 2,
-        wheelType: 2,
-        numberPlate: "RZ196EU"
-    }
-];
-
-const carOptions = (carId: number) => {
-    console.log(`Options for car with ID: ${carId}`);
-}
+import { CarFuelType } from "@/constants/Enums/CarFuelType";
+import { CarTyreType } from "@/constants/Enums/CarTyreType";
 
 export default function TabThreeScreen() {
     const [carsData, setCarsData] = useState<Car[]>([]);
@@ -56,6 +30,14 @@ export default function TabThreeScreen() {
         setRefreshing(false);
     };
 
+    const createNewCar = () => {
+        console.log('Creating new car...');
+    };
+
+    const carOptions = (carId: number) => {
+        console.log(`Options for car with ID: ${carId}`);
+    };
+
     const renderItem = ({ item }: { item: Car }) => (
         <View style={styles.card}>
             <View style={styles.cardContent}>
@@ -64,7 +46,8 @@ export default function TabThreeScreen() {
                 </Text>
                 <Text style={styles.subtitle}>VIN: {item.vin}</Text>
                 <Text style={styles.subtitle}>Rejestracja: {item.numberPlate}</Text>
-                <Text style={styles.subtitle}>Ostatni znany przebieg: </Text>
+                <Text style={styles.subtitle}>Napęd: {CarFuelType[item.fuelType]}</Text>
+                <Text style={styles.subtitle}>Rodzaj opon: {CarTyreType[item.wheelType]}</Text>
             </View>
             <TouchableOpacity style={styles.optionsButton}>
                 <Text style={styles.optionsButtonText}>⛽</Text>
@@ -88,6 +71,9 @@ export default function TabThreeScreen() {
                 refreshing={refreshing}
                 onRefresh={onRefresh}
             />
+            <TouchableOpacity style={styles.addButton} onPress={createNewCar}>
+                <Text>➕</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -127,5 +113,14 @@ const styles = StyleSheet.create({
     optionsButtonText: {
         fontSize: 24,
         color: '#666',
+    },
+    addButton: {
+        position: 'absolute',
+        bottom: 16,
+        right: 16,
+        backgroundColor: '#74bf63',
+        borderRadius: 50,
+        padding: 16,
+        elevation: 4,
     },
 });
