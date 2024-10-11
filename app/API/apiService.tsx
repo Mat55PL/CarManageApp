@@ -2,6 +2,7 @@ import { Alert } from "react-native";
 
 const GET_ALL_CARS_API_URL = 'https://mattu.bieda.it/api/car';
 
+
 export async function getAllCars() {
     try {
         const response = await fetch(GET_ALL_CARS_API_URL);
