@@ -81,8 +81,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="qrcode" color={color} />,
+          title: 'Skaner NFC',
+          tabBarIcon: ({ color }) => <TabBarIcon name="wifi" color={color} />,
         }}
       />
       <Tabs.Screen
