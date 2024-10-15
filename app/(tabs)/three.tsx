@@ -15,7 +15,7 @@ export default function TabThreeScreen() {
     const [stationName, setStationName] = useState('');
     const [fuelAmount, setFuelAmount] = useState('');
     const [amountSpent, setAmountSpent] = useState('');
-
+    const [odometer, setOdometer] = useState('');
     const getData = async () => {
         try {
             const response = await getAllCars();
@@ -141,6 +141,13 @@ export default function TabThreeScreen() {
                                 placeholder="Kwota wydana (PLN)"
                                 value={amountSpent}
                                 onChangeText={setAmountSpent}
+                                keyboardType="numeric"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Przebieg (km)"
+                                value={odometer}
+                                onChangeText={setOdometer}
                                 keyboardType="numeric"
                             />
                             <View style={styles.modalButtons}>
