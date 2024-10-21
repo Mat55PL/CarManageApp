@@ -3,16 +3,7 @@ import React, { useEffect, useState } from 'react';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
-export interface Car {
-  id: number;
-  brand: string;
-  model: string;
-  vin: string;
-  year: number;
-  fuelType: number;
-  wheelType: number;
-  numberPlate: string;
-}
+import { Car } from '@/constants/Interfaces/Car';
 
 export default function TabOneScreen() {
   const [cars, setCars] = useState<Car[]>([]);

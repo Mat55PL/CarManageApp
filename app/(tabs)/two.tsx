@@ -75,6 +75,8 @@ export default function TabTwoScreen() {
   }, []);
 
 
+
+
   if (hasNfc === null) return null;
 
   if (!hasNfc) {
@@ -92,8 +94,6 @@ export default function TabTwoScreen() {
       </View>
     );
   }
-
-
 
   const readTag = async () => {
     console.log('Trying to read tag');

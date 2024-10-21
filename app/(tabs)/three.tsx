@@ -1,7 +1,10 @@
 import { Text, View } from "@/components/Themed";
-import { Car } from "@/app/(tabs)/index";
 import { FlatList, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Modal, TextInput, Platform } from "react-native";
 import { useEffect, useState } from "react";
+
+import CarItem from "@/components/Car/CarItem";
+import FuelTankModal from "../modals/FuelTankModal";
+import { Car } from "@/constants/Interfaces/Car";
 import { getAllCars } from "../API/apiService";
 import { CarFuelType } from "@/constants/Enums/CarFuelType";
 import { CarTyreType } from "@/constants/Enums/CarTyreType";
@@ -9,13 +12,13 @@ import { CarTyreType } from "@/constants/Enums/CarTyreType";
 export default function TabThreeScreen() {
     const [carsData, setCarsData] = useState<Car[]>([]);
     const [refreshing, setRefreshing] = useState(false)
-
     const [isFuelModalVisible, setIsFuelModalVisible] = useState(false);
     const [selectedCarId, setSelectedCarId] = useState<number | null>(null);
     const [stationName, setStationName] = useState('');
     const [fuelAmount, setFuelAmount] = useState('');
     const [amountSpent, setAmountSpent] = useState('');
     const [odometer, setOdometer] = useState('');
+
     const getData = async () => {
         try {
             const response = await getAllCars();
@@ -75,28 +78,8 @@ export default function TabThreeScreen() {
     };
 
     const renderItem = ({ item }: { item: Car }) => (
-        <View style={styles.card}>
-            <View style={styles.cardContent}>
-                <Text style={styles.title}>
-                    {item.brand} {item.model} ({item.year})
-                </Text>
-                <Text style={styles.subtitle}>VIN: {item.vin}</Text>
-                <Text style={styles.subtitle}>Rejestracja: {item.numberPlate}</Text>
-                <Text style={styles.subtitle}>Napęd: {CarFuelType[item.fuelType]}</Text>
-                <Text style={styles.subtitle}>Rodzaj opon: {CarTyreType[item.wheelType]}</Text>
-            </View>
-            <TouchableOpacity style={styles.optionsButton} onPress={() => openFuelModal(item.id)}>
-                <Text style={styles.optionsButtonText}>⛽</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.optionsButton}>
-                <Text style={styles.optionsButtonText}>🔧</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.optionsButton} onPress={() => carOptions(item.id)}>
-                <Text style={styles.optionsButtonText}>⋮</Text>
-            </TouchableOpacity>
-        </View>
+        <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions}></CarItem>
     );
-
 
     return (
         <View style={styles.container}>
@@ -110,61 +93,20 @@ export default function TabThreeScreen() {
             <TouchableOpacity style={styles.addButton} onPress={createNewCar}>
                 <Text>➕</Text>
             </TouchableOpacity>
-            <Modal
-                visible={isFuelModalVisible}
-                animationType="slide"
-                transparent={true}
-                onRequestClose={closeFuelModal}
-            >
-                <View style={styles.modalOverlay}>
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : undefined}
-                    >
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Dodaj tankowanie</Text>
-                            <Text style={styles.subtitle}>Dla samochodu: {selectedCar?.brand} {selectedCar?.model} ({selectedCar?.numberPlate})</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Nazwa stacji"
-                                value={stationName}
-                                onChangeText={setStationName}
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Ilość paliwa (litry)"
-                                value={fuelAmount}
-                                onChangeText={setFuelAmount}
-                                keyboardType="numeric"
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Kwota wydana (PLN)"
-                                value={amountSpent}
-                                onChangeText={setAmountSpent}
-                                keyboardType="numeric"
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Przebieg (km)"
-                                value={odometer}
-                                onChangeText={setOdometer}
-                                keyboardType="numeric"
-                            />
-                            <View style={styles.modalButtons}>
-                                <TouchableOpacity style={styles.modalButton} onPress={handleAddFuel}>
-                                    <Text style={styles.modalButtonText}>Dodaj</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[styles.modalButton, styles.modalButtonCancel]}
-                                    onPress={closeFuelModal}
-                                >
-                                    <Text style={styles.modalButtonText}>Anuluj</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </KeyboardAvoidingView>
-                </View>
-            </Modal>
+            <FuelTankModal
+                isVisible={isFuelModalVisible}
+                onClose={closeFuelModal}
+                onAddFuel={handleAddFuel}
+                stationName={stationName}
+                setStationName={setStationName}
+                fuelAmount={fuelAmount}
+                setFuelAmount={setFuelAmount}
+                amountSpent={amountSpent}
+                setAmountSpent={setAmountSpent}
+                odometer={odometer}
+                setOdometer={setOdometer}
+                selectedCar={selectedCar}
+            />
         </View>
     );
 }
@@ -174,37 +116,6 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
     },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 16,
-        marginVertical: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-        elevation: 2, // Dodaje delikatny cień dla Androida
-        opacity: 0.9,
-    },
-    cardContent: {
-        flex: 1,
-        backgroundColor: 'transparent',
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#333',
-    },
-    subtitle: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 4,
-    },
-    optionsButton: {
-        padding: 8,
-    },
-    optionsButtonText: {
-        fontSize: 24,
-        color: '#666',
-    },
     addButton: {
         position: 'absolute',
         bottom: 16,
@@ -213,48 +124,5 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         padding: 16,
         elevation: 4,
-    },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'flex-end',
-    },
-    modalContent: {
-        backgroundColor: '#fff',
-        padding: 16,
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-    },
-    modalTitle: {
-        color: '#333',
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 3,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        backgroundColor: '#fff',
-    },
-    modalButton: {
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        backgroundColor: '#74bf63',
-        borderRadius: 8,
-        marginLeft: 8,
-    },
-    modalButtonCancel: {
-        backgroundColor: '#ccc',
-    },
-    modalButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
     },
 });
