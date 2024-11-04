@@ -13,5 +13,8 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
+  ],
+  "typeRoots": [
+    "./node_modules/@types",
   ]
 }

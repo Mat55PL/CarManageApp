@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-import { Car } from '@/constants/Interfaces/Car';
+import { ICar } from '@/constants/Interfaces/ICar';
 import { CarFuelType } from '@/constants/Enums/CarFuelType';
 import { CarTyreType } from '@/constants/Enums/CarTyreType';
 
 interface CarItemProps {
-    item: Car;
+    item: ICar;
     openFuelModal: (carId: number) => void;
     carOptions: (carId: number) => void;
 }

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
-import { Car } from '@/constants/Interfaces/Car';
+import { ICar } from '@/constants/Interfaces/ICar';
 
 export default function TabOneScreen() {
-  const [cars, setCars] = useState<Car[]>([]);
+  const [cars, setCars] = useState<ICar[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function TabOneScreen() {
       });
   }, []);
 
-  const renderItem = ({ item }: ListRenderItemInfo<Car>) => (
+  const renderItem = ({ item }: ListRenderItemInfo<ICar>) => (
     <View style={styles.carItem}>
       <Text>Brand: {item.brand}</Text>
       <Text>Model: {item.model}</Text>

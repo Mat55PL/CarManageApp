@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
-import { Car } from "@/constants/Interfaces/Car";
+import { ICar } from "@/constants/Interfaces/ICar";
 
 interface FuelModalProps {
     isVisible: boolean;
@@ -15,7 +15,7 @@ interface FuelModalProps {
     setAmountSpent: (text: string) => void;
     odometer: string;
     setOdometer: (text: string) => void;
-    selectedCar: Car | undefined;
+    selectedCar: ICar | undefined;
 }
 
 const FuelTankModal: React.FC<FuelModalProps> = ({

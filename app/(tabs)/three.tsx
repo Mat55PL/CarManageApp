@@ -4,20 +4,33 @@ import { useEffect, useState } from "react";
 
 import CarItem from "@/components/Car/CarItem";
 import FuelTankModal from "../modals/FuelTankModal";
-import { Car } from "@/constants/Interfaces/Car";
-import { getAllCars } from "../API/apiService";
+import CreateCarModal from "../modals/CreateCarModal";
+import { ICar } from "@/constants/Interfaces/ICar";
+import { getAllCars } from "../services/API/apiService";
 import { CarFuelType } from "@/constants/Enums/CarFuelType";
 import { CarTyreType } from "@/constants/Enums/CarTyreType";
 
+
 export default function TabThreeScreen() {
-    const [carsData, setCarsData] = useState<Car[]>([]);
+    const [carsData, setCarsData] = useState<ICar[]>([]);
+    const [carNames, setCarNames] = useState<string[]>([]);
+    const [error, setError] = useState<string | null>(null);
     const [refreshing, setRefreshing] = useState(false)
     const [isFuelModalVisible, setIsFuelModalVisible] = useState(false);
+    const [isCreateCarModalVisible, setIsCreateCarModalVisible] = useState(false);
     const [selectedCarId, setSelectedCarId] = useState<number | null>(null);
     const [stationName, setStationName] = useState('');
     const [fuelAmount, setFuelAmount] = useState('');
     const [amountSpent, setAmountSpent] = useState('');
     const [odometer, setOdometer] = useState('');
+    const [brand, setBrand] = useState('');
+    const [model, setModel] = useState('');
+    const [vin, setVin] = useState('');
+    const [productionYear, setProductionYear] = useState('');
+    const [fuelType, setFuelType] = useState<CarFuelType>(CarFuelType.Benzyna);
+    const [wheelType, setWheelType] = useState<CarTyreType>(CarTyreType.Letnie);
+    const [numberPlate, setNumberPlate] = useState('');
+
 
     const getData = async () => {
         try {
@@ -25,6 +38,7 @@ export default function TabThreeScreen() {
             setCarsData(response);
         } catch (error) {
             console.error(error);
+            setError(`Wystąpił błąd podczas pobierania danych: ${error}`);
         }
     };
 
@@ -41,6 +55,7 @@ export default function TabThreeScreen() {
 
     const createNewCar = () => {
         console.log('Creating new car...');
+        openCreateCarModal();
     };
 
     const carOptions = (carId: number) => {
@@ -59,7 +74,15 @@ export default function TabThreeScreen() {
         setAmountSpent('');
     };
 
-    const selectedCar = carsData.find((car) => car.id === selectedCarId);
+    const openCreateCarModal = () => {
+        setIsCreateCarModalVisible(true);
+    };
+
+    const closeCreateCarModal = () => {
+        setIsCreateCarModalVisible(false);
+    };
+
+    const selectedCar = (!error) ? carsData.find((car) => car.id === selectedCarId) : undefined;
 
     const handleAddFuel = () => {
         // Logika dodawania wpisu tankowania
@@ -77,12 +100,43 @@ export default function TabThreeScreen() {
         closeFuelModal();
     };
 
-    const renderItem = ({ item }: { item: Car }) => (
+    const handleAddCar = () => {
+        console.log('Adding new car...');
+        console.log('Brand:', brand);
+        console.log('Model:', model);
+        console.log('VIN:', vin);
+        console.log('Production Year:', productionYear);
+        console.log('Fuel Type:', fuelType);
+        console.log('Wheel Type:', wheelType);
+        console.log('Number Plate:', numberPlate);
+
+        // TODO: Implementacja logiki dodawania nowego pojazdu
+
+        // Wyczyść pola formularza
+        setBrand('');
+        setModel('');
+        setVin('');
+        setProductionYear('');
+        setFuelType(CarFuelType.Benzyna);
+        setWheelType(CarTyreType.Letnie);
+        setNumberPlate('');
+
+        closeCreateCarModal();
+    };
+
+
+    const renderItem = ({ item }: { item: ICar }) => (
         <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions}></CarItem>
     );
 
     return (
         <View style={styles.container}>
+            {error ? (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                    <Text>Sprawdź swoje połączenie z internetem... 😥</Text>
+                </View>
+            ) : null}
             <FlatList
                 data={carsData}
                 renderItem={renderItem}
@@ -107,6 +161,25 @@ export default function TabThreeScreen() {
                 setOdometer={setOdometer}
                 selectedCar={selectedCar}
             />
+            <CreateCarModal
+                isVisible={isCreateCarModalVisible}
+                onClose={closeCreateCarModal}
+                onAddCar={handleAddCar}
+                brand={brand}
+                setBrand={setBrand}
+                model={model}
+                setModel={setModel}
+                vin={vin}
+                setVin={setVin}
+                productionYear={productionYear}
+                setProductionYear={setProductionYear}
+                fuelType={fuelType}
+                setFuelType={setFuelType}
+                wheelType={wheelType}
+                setWheelType={setWheelType}
+                numberPlate={numberPlate}
+                setNumberPlate={setNumberPlate}
+            />
         </View>
     );
 }
@@ -124,5 +197,17 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         padding: 16,
         elevation: 4,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    errorContainer: {
+        padding: 20,
+        alignItems: 'center',
+        backgroundColor: '#294230',
+        borderRadius: 5,
+        marginVertical: 10,
     },
 });

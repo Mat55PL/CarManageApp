@@ -13,7 +13,9 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@devvie/bottom-sheet": "^0.4.2",
     "@expo/vector-icons": "^14.0.2",
+    "@mobile-reality/react-native-select-pro": "^2.3.0",
     "@react-navigation/native": "^6.0.2",
     "expo": "~51.0.24",
     "expo-font": "~12.0.9",
