@@ -6,9 +6,10 @@ import CarItem from "@/components/Car/CarItem";
 import FuelTankModal from "../modals/FuelTankModal";
 import CreateCarModal from "../modals/CreateCarModal";
 import { ICar } from "@/constants/Interfaces/ICar";
-import { getAllCars } from "../services/API/apiService";
+import { addCar, getAllCars } from "../services/API/apiService";
 import { CarFuelType } from "@/constants/Enums/CarFuelType";
 import { CarTyreType } from "@/constants/Enums/CarTyreType";
+import { CarValidation } from "@/components/Car/CarValidation";
 
 
 export default function TabThreeScreen() {
@@ -27,8 +28,8 @@ export default function TabThreeScreen() {
     const [model, setModel] = useState('');
     const [vin, setVin] = useState('');
     const [productionYear, setProductionYear] = useState('');
-    const [fuelType, setFuelType] = useState<CarFuelType>(CarFuelType.Benzyna);
-    const [wheelType, setWheelType] = useState<CarTyreType>(CarTyreType.Letnie);
+    const [fuelType, setFuelType] = useState<number | null>(null);
+    const [wheelType, setWheelType] = useState<number | null>(null);
     const [numberPlate, setNumberPlate] = useState('');
 
 
@@ -101,15 +102,20 @@ export default function TabThreeScreen() {
     };
 
     const handleAddCar = () => {
-        console.log('Adding new car...');
-        console.log('Brand:', brand);
-        console.log('Model:', model);
-        console.log('VIN:', vin);
-        console.log('Production Year:', productionYear);
-        console.log('Fuel Type:', fuelType);
-        console.log('Wheel Type:', wheelType);
-        console.log('Number Plate:', numberPlate);
-
+        if (!(CarValidation({ brand, model, vin, year: parseInt(productionYear), fuelType: fuelType ?? 0, wheelType: wheelType ?? 0, numberPlate }).length > 0)) {
+            addCar({
+                brand: brand,
+                model: model,
+                vin: vin,
+                year: parseInt(productionYear),
+                fuelType: fuelType ?? 0,
+                wheelType: wheelType ?? 0,
+                numberPlate: numberPlate
+            });
+        } else {
+            console.log('Validation failed');
+            return;
+        }
         // TODO: Implementacja logiki dodawania nowego pojazdu
 
         // Wyczyść pola formularza
@@ -175,7 +181,7 @@ export default function TabThreeScreen() {
                 setProductionYear={setProductionYear}
                 fuelType={fuelType}
                 setFuelType={setFuelType}
-                wheelType={wheelType}
+                wheelType={wheelType ?? 0}
                 setWheelType={setWheelType}
                 numberPlate={numberPlate}
                 setNumberPlate={setNumberPlate}
