@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-
+import { ICreateCar } from "@/constants/Interfaces/ICreateCar";
 const CARS_API_URL = 'https://mattu.bieda.it/api/car';
 const CARS_FUEL_HISTORY_API_URL = 'https://mattu.bieda.it/api/CarFuelHistory';
 
@@ -19,6 +19,31 @@ export async function getAllCars() {
         Alert.alert("Występił błąd", `Nie udało się pobrać danych z serwera. Sprawdź połączenie z internetem. ${error.message}`, [{ text: "OK" }]);
     }
 
+}
+
+export async function addCar(car: ICreateCar) {
+    console.log(`Adding car: ${JSON.stringify(car)}`);
+    try {
+        const response = await fetch(CARS_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(car),
+        });
+
+        const responseBody = await response.text();
+
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log(`Response: ${responseBody}`);
+    } catch (error: any) {
+        Alert.alert("Wystąpił błąd", `Nie udało się dodać pojazdu. Sprawdź połączenie z internetem. ${error.message}`, [{ text: "OK" }]);
+        console.log(`Error: ${error}`);
+    }
 }
 
 export async function getCarFuelHistory(carId: number) {
