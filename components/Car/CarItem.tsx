@@ -15,7 +15,7 @@ const CarItem: React.FC<CarItemProps> = ({ item, openFuelModal, carOptions }) =>
     <View style={styles.card}>
         <View style={styles.cardContent}>
             <Text style={styles.title}>
-                {item.brand} {item.model} ({item.year})
+                [{item.id}] {item.brand} {item.model} ({item.year})
             </Text>
             <Text style={styles.subtitle}>VIN: {item.vin}</Text>
             <Text style={styles.subtitle}>Rejestracja: {item.numberPlate}</Text>

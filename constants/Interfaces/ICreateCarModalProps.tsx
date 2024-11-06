@@ -10,10 +10,10 @@ export interface ICreateCarModalProps {
     setVin: (text: string) => void;
     productionYear: string;
     setProductionYear: (text: string) => void;
-    fuelType: number;
-    setFuelType: (text: number) => void;
+    fuelType: any;
+    setFuelType: (text: any) => void;
     wheelType: number;
-    setWheelType: (text: number) => void;
+    setWheelType: (text: any) => void;
     numberPlate: string;
     setNumberPlate: (text: string) => void;
 }
