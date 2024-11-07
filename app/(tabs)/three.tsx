@@ -1,5 +1,5 @@
 import { Text, View } from "@/components/Themed";
-import { FlatList, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Modal, TextInput, Platform } from "react-native";
+import { FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 
 import CarItem from "@/components/Car/CarItem";
@@ -10,15 +10,16 @@ import { addCar, getAllCars } from "../services/API/apiService";
 import { CarFuelType } from "@/constants/Enums/CarFuelType";
 import { CarTyreType } from "@/constants/Enums/CarTyreType";
 import { CarValidation } from "@/components/Car/CarValidation";
+import CarOptionsModal from "../modals/CarOptionsModal";
 
 
 export default function TabThreeScreen() {
     const [carsData, setCarsData] = useState<ICar[]>([]);
-    const [carNames, setCarNames] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [refreshing, setRefreshing] = useState(false)
     const [isFuelModalVisible, setIsFuelModalVisible] = useState(false);
     const [isCreateCarModalVisible, setIsCreateCarModalVisible] = useState(false);
+    const [isCarOptionsModalVisible, setIsCarOptionsModalVisible] = useState(false);
     const [selectedCarId, setSelectedCarId] = useState<number | null>(null);
     const [stationName, setStationName] = useState('');
     const [fuelAmount, setFuelAmount] = useState('');
@@ -61,6 +62,7 @@ export default function TabThreeScreen() {
 
     const carOptions = (carId: number) => {
         console.log(`Options for car with ID: ${carId}`);
+        openCarOptionsModal(carId);
     };
 
     const openFuelModal = (carId: number) => {
@@ -82,6 +84,15 @@ export default function TabThreeScreen() {
     const closeCreateCarModal = () => {
         setIsCreateCarModalVisible(false);
     };
+
+    const closeCarOptionsModal = () => {
+        setIsCarOptionsModalVisible(false);
+    }
+
+    const openCarOptionsModal = (carId: number) => {
+        setSelectedCarId(carId);
+        setIsCarOptionsModalVisible(true);
+    }
 
     const selectedCar = (!error) ? carsData.find((car) => car.id === selectedCarId) : undefined;
 
@@ -130,6 +141,13 @@ export default function TabThreeScreen() {
         closeCreateCarModal();
     };
 
+    const handleDeleteCar = () => {
+        console.log('Deleting car with ID:', selectedCarId);
+    };
+
+    const handleEditCar = () => {
+        console.log('Editing car with ID:', selectedCarId);
+    }
 
     const renderItem = ({ item }: { item: ICar }) => (
         <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions}></CarItem>
@@ -185,6 +203,13 @@ export default function TabThreeScreen() {
                 setWheelType={setWheelType}
                 numberPlate={numberPlate}
                 setNumberPlate={setNumberPlate}
+            />
+            <CarOptionsModal
+                isVisible={isCarOptionsModalVisible}
+                onClose={closeCarOptionsModal}
+                selectedCar={selectedCar ?? null}
+                onDeleteCar={handleDeleteCar}
+                onEditCar={handleEditCar}
             />
         </View>
     );
