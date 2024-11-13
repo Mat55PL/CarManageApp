@@ -4,7 +4,7 @@ import React from "react";
 import { KeyboardAvoidingView, Modal, Platform, StyleSheet, TouchableOpacity } from "react-native";
 
 const CarOptionsModal: React.FC<ICarOptionsModalProps> = ({
-    isVisible, onClose, onDeleteCar, onEditCar, selectedCar
+    isVisible, onClose, onDeleteCar, onEditCar, selectedCar, onFuelHistory
 }) => {
     return (
         <Modal
@@ -27,7 +27,7 @@ const CarOptionsModal: React.FC<ICarOptionsModalProps> = ({
                             <TouchableOpacity style={[styles.modalButton, styles.editButton]} onPress={onEditCar}>
                                 <Text style={styles.modalButtonText}>Edytuj pojazd</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.modalButton, styles.historyButton]} onPress={onClose}>
+                            <TouchableOpacity style={[styles.modalButton, styles.historyButton]} onPress={onFuelHistory}>
                                 <Text style={styles.modalButtonText}>Sprawdź historie tankowania</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={onClose}>

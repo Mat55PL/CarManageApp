@@ -6,4 +6,5 @@ export interface ICarOptionsModalProps {
     selectedCar: ICar | null;
     onDeleteCar: () => void;
     onEditCar: () => void;
+    onFuelHistory: () => void;
 }
