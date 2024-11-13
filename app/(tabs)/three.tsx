@@ -1,6 +1,7 @@
 import { Text, View } from "@/components/Themed";
 import { FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 
 import CarItem from "@/components/Car/CarItem";
 import FuelTankModal from "../modals/FuelTankModal";
@@ -33,6 +34,7 @@ export default function TabThreeScreen() {
     const [wheelType, setWheelType] = useState<number | null>(null);
     const [numberPlate, setNumberPlate] = useState('');
 
+    const router = useRouter();
 
     const getData = async () => {
         try {
@@ -97,13 +99,11 @@ export default function TabThreeScreen() {
     const selectedCar = (!error) ? carsData.find((car) => car.id === selectedCarId) : undefined;
 
     const handleAddFuel = () => {
-        // Logika dodawania wpisu tankowania
         console.log('Adding fuel record for car ID:', selectedCarId);
         console.log('Station Name:', stationName);
         console.log('Fuel Amount:', fuelAmount);
         console.log('Amount Spent:', amountSpent);
 
-        // Wyczyść pola formularza
         setStationName('');
         setFuelAmount('');
         setAmountSpent('');
@@ -127,9 +127,7 @@ export default function TabThreeScreen() {
             console.log('Validation failed');
             return;
         }
-        // TODO: Implementacja logiki dodawania nowego pojazdu
 
-        // Wyczyść pola formularza
         setBrand('');
         setModel('');
         setVin('');
@@ -147,6 +145,20 @@ export default function TabThreeScreen() {
 
     const handleEditCar = () => {
         console.log('Editing car with ID:', selectedCarId);
+    }
+
+    const handleFuelHistory = () => {
+        console.log('Fuel history for car with ID:', selectedCarId);
+        if (selectedCarId !== null) {
+            router.push({
+                pathname: '/pages/FuelHistory/[carId]',
+                params: { carId: selectedCar ? selectedCar.id.toString() : '' },
+            });
+
+            closeCarOptionsModal();
+        } else {
+            console.error('Selected car ID is null');
+        }
     }
 
     const renderItem = ({ item }: { item: ICar }) => (
@@ -210,6 +222,7 @@ export default function TabThreeScreen() {
                 selectedCar={selectedCar ?? null}
                 onDeleteCar={handleDeleteCar}
                 onEditCar={handleEditCar}
+                onFuelHistory={handleFuelHistory}
             />
         </View>
     );
