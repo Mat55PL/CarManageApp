@@ -1,7 +1,6 @@
 import React from "react";
 import { Text, Modal, View, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Select, SelectModalProvider, SelectProvider } from '@mobile-reality/react-native-select-pro';
-import { ICar } from "@/constants/Interfaces/ICar";
 import { ICreateCarModalProps } from "@/constants/Interfaces/ICreateCarModalProps";
 import { getCarsBrands, getCarsModels } from "../services/Files/fileSystem";
 import { CarFuelType } from "@/constants/Enums/CarFuelType";
@@ -76,6 +75,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContent: {
+        width: '100%',
         backgroundColor: '#fff',
         padding: 16,
         borderTopLeftRadius: 16,

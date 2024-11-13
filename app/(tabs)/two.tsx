@@ -1,9 +1,6 @@
-import NfcManager, { NfcEvents, NfcTech } from 'react-native-nfc-manager';
-
+import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { AppState, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { SetStateAction, useEffect, useState } from 'react';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
 
