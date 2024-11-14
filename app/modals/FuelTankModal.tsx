@@ -34,7 +34,7 @@ const FuelTankModal: React.FC<FuelModalProps> = ({
             >
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Dodaj tankowanie</Text>
-                    <Text style={styles.subtitle}>Dla pojazdu: {selectedCar?.brand} {selectedCar?.model} ({selectedCar?.numberPlate})</Text>
+                    {selectedCar && <Text style={styles.subtitle}>Dla pojazdu: {selectedCar?.brand} {selectedCar?.model} ({selectedCar?.numberPlate})</Text>}
                     <TextInput
                         style={styles.input}
                         placeholder="Nazwa stacji"
