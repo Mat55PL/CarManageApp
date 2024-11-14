@@ -22,10 +22,12 @@ export default function TabThreeScreen() {
     const [isCreateCarModalVisible, setIsCreateCarModalVisible] = useState(false);
     const [isCarOptionsModalVisible, setIsCarOptionsModalVisible] = useState(false);
     const [selectedCarId, setSelectedCarId] = useState<number | null>(null);
+    //fuel modal
     const [stationName, setStationName] = useState('');
     const [fuelAmount, setFuelAmount] = useState('');
     const [amountSpent, setAmountSpent] = useState('');
     const [odometer, setOdometer] = useState('');
+    //create car modal
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState('');
     const [vin, setVin] = useState('');
@@ -151,7 +153,7 @@ export default function TabThreeScreen() {
         console.log('Fuel history for car with ID:', selectedCarId);
         if (selectedCarId !== null) {
             router.push({
-                pathname: '/pages/FuelHistory/[carId]',
+                pathname: '/pages/FuelHistory/mainScreen',
                 params: { carId: selectedCar ? selectedCar.id.toString() : '' },
             });
 
@@ -179,6 +181,9 @@ export default function TabThreeScreen() {
                 keyExtractor={(item) => item.id.toString()}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
+                ListEmptyComponent={<Text style={styles.emptyComponent}>
+                    Brak pojazdów do wyświetlenia</Text>
+                }
             />
             <TouchableOpacity style={styles.addButton} onPress={createNewCar}>
                 <Text>➕</Text>
@@ -253,5 +258,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#294230',
         borderRadius: 5,
         marginVertical: 10,
+    },
+    emptyComponent: {
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#666',
+        fontWeight: '600',
     },
 });

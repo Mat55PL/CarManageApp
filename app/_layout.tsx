@@ -56,7 +56,7 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name='pages/FuelHistory/[carId]' options={{ headerShown: false, presentation: "transparentModal" }} />
+        <Stack.Screen name='pages/FuelHistory/mainScreen' options={({ route, navigation }) => ({ headerShown: true, presentation: "transparentModal", title: `Historia tankowania [${route.params.carId}]` })} />
       </Stack>
     </ThemeProvider>
   );

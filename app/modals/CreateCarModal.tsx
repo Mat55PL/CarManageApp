@@ -18,11 +18,12 @@ const CreateCarModal: React.FC<ICreateCarModalProps> = ({
             onRequestClose={onClose}
         >
             <SelectModalProvider>
-                <View style={styles.modalOverlay}>
-                    <ScrollView>
-                        <KeyboardAvoidingView
-                            behavior={Platform.OS === "ios" ? "padding" : undefined}
-                        >
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === "ios" ? "padding" : undefined}
+                >
+                    <View style={styles.modalOverlay}>
+                        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                             <View style={styles.modalContent}>
                                 <Text style={styles.modalTitle}>Dodaj nowy pojazd</Text>
                                 <Text style={styles.subtitle}>Marka</Text>
@@ -60,9 +61,10 @@ const CreateCarModal: React.FC<ICreateCarModalProps> = ({
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        </KeyboardAvoidingView>
-                    </ScrollView>
-                </View>
+
+                        </ScrollView>
+                    </View>
+                </KeyboardAvoidingView>
             </SelectModalProvider>
         </Modal >
     </SelectProvider >
@@ -70,10 +72,12 @@ const CreateCarModal: React.FC<ICreateCarModalProps> = ({
 
 const styles = StyleSheet.create({
     modalOverlay: {
-        flex: 1,
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
         backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'flex-end',
     },
+
     modalContent: {
         width: '100%',
         backgroundColor: '#fff',
