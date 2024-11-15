@@ -46,19 +46,23 @@ export async function addCar(car: ICreateCar) {
     }
 }
 
-export async function getCarFuelHistory(carId: number) {
+export async function deleteCar(carId: number) {
+    console.log(`Deleting car with ID: ${carId}`);
     try {
-        const response = await fetch(`${CARS_FUEL_HISTORY_API_URL}/car/${carId}`);
+        const response = await fetch(`${CARS_API_URL}/${carId}`, {
+            method: 'DELETE',
+        });
+
+        const responseBody = await response.text();
 
         if (!response.ok) {
             console.error(`HTTP error! status: ${response.status}`);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        return data;
-    }
-    catch (error: any) {
-        Alert.alert("Wystąpił błąd", `Nie udało się pobrać danych z serwera. Sprawdź połączenie z internetem. ${error.message}`, [{ text: "OK" }]);
+        console.log(`Response: ${responseBody}`);
+    } catch (error: any) {
+        Alert.alert("Wystąpił błąd", `Nie udało się usunąć pojazdu. Sprawdź połączenie z internetem. ${error.message}`, [{ text: "OK" }]);
+        console.log(`Error: ${error}`);
     }
 }

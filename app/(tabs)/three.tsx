@@ -154,7 +154,10 @@ export default function TabThreeScreen() {
         if (selectedCarId !== null) {
             router.push({
                 pathname: '/pages/FuelHistory/mainScreen',
-                params: { carId: selectedCar ? selectedCar.id.toString() : '' },
+                params: {
+                    carId: selectedCar ? selectedCar.id.toString() : '',
+                    CarFuelType: selectedCar ? selectedCar.fuelType : 0
+                },
             });
 
             closeCarOptionsModal();

@@ -4,11 +4,15 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity }
 import { router, useLocalSearchParams } from 'expo-router';
 import FuelTankModal from '@/app/modals/FuelTankModal';
 import { IFuel } from '@/constants/Interfaces/IFuel';
-import { GetAllFuelHistoryForCarId } from '@/app/services/API/apiFuelService';
+import { AddFuelHistoryForCarId, GetAllFuelHistoryForCarId } from '@/app/services/API/apiFuelService';
 import FuelItem from '@/components/Fuel/FuelItem';
+import { FuelValidation } from '@/components/Fuel/FuelValidation';
+import { CarFuelType } from '@/constants/Enums/CarFuelType';
 
 const FuelHistoryScreen: React.FC = () => {
-    const { carId } = useLocalSearchParams<{ carId: string }>();
+    const params = useLocalSearchParams();
+    const carId = params.carId ? Number(params.carId) : 0;
+    const fuelType = params.CarFuelType ? Number(params.CarFuelType) : 0;
     const [fuelData, setFuelData] = useState<IFuel[]>([]);
     //fuel modal
     const [isFuelModalVisible, setIsFuelModalVisible] = useState(false);
@@ -22,7 +26,7 @@ const FuelHistoryScreen: React.FC = () => {
 
     const getData = async () => {
         try {
-            const response = await GetAllFuelHistoryForCarId(parseInt(carId));
+            const response = await GetAllFuelHistoryForCarId(carId);
             setFuelData(response);
             setLoading(false);
             console.log(`Fuel Data for [${carId}]:`, response);
@@ -63,6 +67,32 @@ const FuelHistoryScreen: React.FC = () => {
 
     const fuelModalAddFuel = () => {
         console.log('Adding fuel...');
+        if (!(FuelValidation({
+            carId: carId, date: new Date().toISOString(),
+            fuelAmount: parseFloat(fuelAmount), cost: parseFloat(amountSpent),
+            odometer: parseFloat(odometer), fuelType: fuelType, location: stationName, note: ''
+        }).length > 0)) {
+            AddFuelHistoryForCarId({
+                carId: carId, date: new Date().toISOString(),
+                fuelAmount: parseFloat(fuelAmount), cost: parseFloat(amountSpent),
+                odometer: parseFloat(odometer), fuelType: fuelType, location: stationName, note: ''
+            });
+            // add fuel to the list
+            setFuelData([...fuelData, {
+                id: fuelData.length + 1,
+                carId: carId,
+                date: new Date().toISOString(),
+                fuelAmount: parseFloat(fuelAmount),
+                cost: parseFloat(amountSpent),
+                odometer: parseFloat(odometer),
+                fuelType: fuelType,
+                location: stationName,
+                note: ''
+            }]);
+            closeFuelModal();
+        } else {
+            console.log('Fuel data is invalid');
+        }
     };
 
     const renderFuelHistoryItem = ({ item }: { item: IFuel }) => (
@@ -110,7 +140,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: '#fff',
-        paddingTop: 50
+        paddingTop: 20
     },
     title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
     buttonsContainer: {
