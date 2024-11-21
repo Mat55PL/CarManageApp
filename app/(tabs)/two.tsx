@@ -30,7 +30,6 @@ export default function TabTwoScreen() {
   useEffect(() => {
     const handleAppStateChange = (nextAppState: SetStateAction<string>) => {
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        // Aplikacja wróciła do aktywnego stanu, ponownie sprawdź status NFC
         checkIsNfcActive();
       }
       setAppState(nextAppState);
