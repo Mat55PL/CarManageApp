@@ -13,6 +13,5 @@ const CarTyreTypeNames = {
 };
 
 export const getTyreTypeName = (tyreType: CarTyreType) => {
-    console.log(`[getTyreTypeName] tyreType: ${tyreType} `);
     return CarTyreTypeNames[tyreType];
 };
