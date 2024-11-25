@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import { ICar } from "@/constants/Interfaces/ICar";
+import { Select } from "@mobile-reality/react-native-select-pro";
 
 interface FuelModalProps {
     isVisible: boolean;
