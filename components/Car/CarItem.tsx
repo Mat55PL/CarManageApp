@@ -9,9 +9,10 @@ interface CarItemProps {
     item: ICar;
     openFuelModal: (carId: number) => void;
     carOptions: (carId: number) => void;
+    openInfoPage: (carId: number) => void;
 }
 
-const CarItem: React.FC<CarItemProps> = ({ item, openFuelModal, carOptions }) => (
+const CarItem: React.FC<CarItemProps> = ({ item, openFuelModal, carOptions, openInfoPage }) => (
     <View style={styles.card}>
         <View style={styles.cardContent}>
             <Text style={styles.title}>
@@ -22,6 +23,9 @@ const CarItem: React.FC<CarItemProps> = ({ item, openFuelModal, carOptions }) =>
             <Text style={styles.subtitle}>Napęd: {CarFuelType[item.fuelType]}</Text>
             <Text style={styles.subtitle}>Rodzaj opon: {CarTyreType[item.wheelType]}</Text>
         </View>
+        <TouchableOpacity style={styles.optionsButton} onPress={() => openInfoPage(item.id)}>
+            <Text style={styles.optionsButtonText}>ℹ️</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.optionsButton} onPress={() => openFuelModal(item.id)}>
             <Text style={styles.optionsButtonText}>⛽</Text>
         </TouchableOpacity>
