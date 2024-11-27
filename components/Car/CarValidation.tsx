@@ -28,18 +28,6 @@ export function CarValidation(car: ICreateCar) {
         return errors;
     }
 
-    if (!car.fuelType) {
-        errors.push('Typ paliwa jest wymagany');
-        Alert.alert('Błąd 🛑', 'Typ paliwa jest wymagany');
-        return errors;
-    }
-
-    if (!car.wheelType) {
-        errors.push('Typ opon jest wymagany');
-        Alert.alert('Błąd 🛑', 'Typ opon jest wymagany');
-        return errors;
-    }
-
     if (!car.numberPlate) {
         errors.push('Numer rejestracyjny jest wymagany');
         Alert.alert('Błąd 🛑', 'Numer rejestracyjny jest wymagany');
