@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
+import Ionicons from '@expo/vector-icons/Ionicons';
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { ICar } from '@/constants/Interfaces/ICar';
 import { CarFuelType } from '@/constants/Enums/CarFuelType';
 import { CarTyreType } from '@/constants/Enums/CarTyreType';
@@ -24,7 +25,9 @@ const CarItem: React.FC<CarItemProps> = ({ item, openFuelModal, carOptions, open
             <Text style={styles.subtitle}>Rodzaj opon: {CarTyreType[item.wheelType]}</Text>
         </View>
         <TouchableOpacity style={styles.optionsButton} onPress={() => openInfoPage(item.id)}>
-            <Text style={styles.optionsButtonText}>ℹ️</Text>
+            <Text style={styles.optionsButtonText}>
+                <Ionicons name="information-circle-sharp" size={37} color="#4A90E2" />
+            </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.optionsButton} onPress={() => openFuelModal(item.id)}>
             <Text style={styles.optionsButtonText}>⛽</Text>
@@ -33,7 +36,9 @@ const CarItem: React.FC<CarItemProps> = ({ item, openFuelModal, carOptions, open
             <Text style={styles.optionsButtonText}>🔧</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.optionsButton} onPress={() => carOptions(item.id)}>
-            <Text style={styles.optionsButtonText}>⋮</Text>
+            <Text style={styles.optionsButtonText}>
+                <SimpleLineIcons name="options-vertical" size={24} color="#6E7F9A" />
+            </Text>
         </TouchableOpacity>
     </View>
 );
