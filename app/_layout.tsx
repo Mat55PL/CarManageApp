@@ -40,7 +40,20 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={currentTheme}>
-      <Slot />
+      <Slot
+        screenOptions={{
+          headerShown: false, // Domyślnie ukryj nagłówek
+          headerBackTitle: 'Wstecz',
+          headerStyle: {
+            backgroundColor: currentTheme.colors.background,
+          },
+          headerTintColor: currentTheme.colors.text,
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitleVisible: true,
+        }}
+      />
     </ThemeProvider>
   );
 }
