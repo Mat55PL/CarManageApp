@@ -1,13 +1,14 @@
 import { Text, View } from "@/components/Themed";
-import { FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import CarItem from "@/components/Car/CarItem";
 import FuelTankModal from "../modals/FuelTankModal";
 import CreateCarModal from "../modals/CreateCarModal";
 import { ICar } from "@/constants/Interfaces/ICar";
-import { addCar, getAllCars } from "../services/API/apiService";
+import { addCar, deleteCar, getAllCars } from "../services/API/apiService";
 import { CarFuelType } from "@/constants/Enums/CarFuelType";
 import { CarTyreType } from "@/constants/Enums/CarTyreType";
 import { CarValidation } from "@/components/Car/CarValidation";
@@ -141,8 +142,31 @@ export default function TabThreeScreen() {
         closeCreateCarModal();
     };
 
-    const handleDeleteCar = () => {
+    const handleDeleteCar = async () => {
         console.log('Deleting car with ID:', selectedCarId);
+        if (selectedCarId !== null) {
+            Alert.alert('Usunięcie pojazdu', 'Czy na pewno chcesz usunąć ten pojazd?', [
+                {
+                    text: 'Tak',
+                    onPress: async () => {
+                        await deleteCar(selectedCarId);
+                        console.log(`Car with ID: ${selectedCarId} has been deleted`);
+                        await getData();
+                        closeCarOptionsModal();
+                    },
+                },
+                {
+                    text: 'Nie',
+                    onPress: () => {
+                        console.log('Car deletion canceled');
+                        //closeCarOptionsModal();
+                    },
+                },
+            ]);
+        }
+        else {
+            console.error('Selected car ID is null');
+        }
     };
 
     const handleEditCar = () => {
@@ -166,8 +190,20 @@ export default function TabThreeScreen() {
         }
     }
 
+    const openInfoPage = (carId: number) => {
+        console.log(`Info page for car with ID: ${carId}`);
+        if (carId !== null) {
+            router.push({
+                pathname: '/pages/Car/CarInfoPage',
+                params: {
+                    car: JSON.stringify(carsData.find((car) => car.id === carId)),
+                },
+            });
+        };
+    }
+
     const renderItem = ({ item }: { item: ICar }) => (
-        <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions}></CarItem>
+        <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions} openInfoPage={openInfoPage} />
     );
 
     return (
@@ -185,11 +221,11 @@ export default function TabThreeScreen() {
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 ListEmptyComponent={<Text style={styles.emptyComponent}>
-                    Brak pojazdów do wyświetlenia</Text>
+                    Brak pojazdów do wyświetlenia lub wystąpił błąd połączenia 🥹</Text>
                 }
             />
             <TouchableOpacity style={styles.addButton} onPress={createNewCar}>
-                <Text>➕</Text>
+                <FontAwesome name="plus" size={22} color="#6e6e6e" />
             </TouchableOpacity>
             <FuelTankModal
                 isVisible={isFuelModalVisible}
