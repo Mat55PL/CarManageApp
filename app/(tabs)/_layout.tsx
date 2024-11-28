@@ -87,7 +87,7 @@ export default function TabLayout() {
                 router.push('/pages/Login/login');
               }}>
                 {({ pressed }) => (
-                  <FontAwesome name="sign-out" size={24} color={Colors[colorScheme ?? 'light'].text} />
+                  <FontAwesome name="sign-out" size={24} color={Colors[colorScheme ?? 'light'].text} style={{ marginRight: 15 }} />
                 )}
               </Pressable>
             </View>
