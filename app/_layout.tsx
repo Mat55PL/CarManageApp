@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Slot } from 'expo-router';
+import { Slot, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -40,20 +40,29 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={currentTheme}>
-      <Slot
-        screenOptions={{
-          headerShown: false, // Domyślnie ukryj nagłówek
-          headerBackTitle: 'Wstecz',
-          headerStyle: {
-            backgroundColor: currentTheme.colors.background,
-          },
-          headerTintColor: currentTheme.colors.text,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          headerBackTitleVisible: true,
-        }}
-      />
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name='pages/FuelHistory/mainScreen'
+          options={({ route }) => ({
+            headerShown: true,
+            presentation: "transparentModal",
+            title: `Historia tankowania [${route.params?.carId || ''}]`
+          })}
+        />
+        <Stack.Screen
+          name='pages/Car/CarInfoPage'
+          options={{
+            headerShown: true,
+            title: `Informacje o pojeździe`
+          }}
+        />
+        <Stack.Screen
+          name='pages/Login/login'
+          options={{ headerShown: false }}
+        />
+      </Stack>
     </ThemeProvider>
   );
 }
