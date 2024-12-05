@@ -4,6 +4,7 @@ import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
 import { ICar } from '@/constants/Interfaces/ICar';
+import { FIREBASE_AUTH } from '@/FirebaseConfig';
 
 export default function TabOneScreen() {
   const [cars, setCars] = useState<ICar[]>([]);
@@ -35,11 +36,15 @@ export default function TabOneScreen() {
     </View>
   );
 
+  const user = FIREBASE_AUTH.currentUser;
+
   const listHeader = () => (
     <View style={styles.headerContainer}>
       <Text style={styles.title}>Tab One</Text>
+      <Text>Witaj {user?.displayName}! 🎉</Text>
+      <Text>USER: {user?.uid}</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      {/*<EditScreenInfo path="app/(tabs)/index.tsx" /> */}
     </View>
   );
 

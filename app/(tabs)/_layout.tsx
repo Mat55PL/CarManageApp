@@ -1,13 +1,14 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Link, Redirect, router, Tabs } from 'expo-router';
 import { Pressable, View, Appearance } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { FIREBASE_AUTH } from '@/FirebaseConfig';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
@@ -22,20 +23,26 @@ export default function TabLayout() {
     Appearance.setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
   }
 
+  const user = FIREBASE_AUTH.currentUser;
+
+  // Jeśli nie ma użytkownika, przekieruj do logowania
+  if (!user) {
+    return <Redirect href="/pages/Login/login" />;
+  }
+
+  // Renderuj zakładki tylko dla zalogowanych
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         tabBarStyle: { height: 57 },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Pressable onPress={changeTheme}>
               {({ pressed }) => (
-                <FontAwesome
-                  name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
+                <Ionicons
+                  name={colorScheme === 'dark' ? 'sunny' : 'moon'}
                   size={25}
                   color={Colors[colorScheme ?? 'light'].text}
                   style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
@@ -54,8 +61,8 @@ export default function TabLayout() {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Pressable onPress={changeTheme}>
                 {({ pressed }) => (
-                  <FontAwesome
-                    name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
+                  <Ionicons
+                    name={colorScheme === 'dark' ? 'sunny' : 'moon'}
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
@@ -74,6 +81,15 @@ export default function TabLayout() {
                   )}
                 </Pressable>
               </Link>
+              <Pressable onPress={() => {
+                console.log('Sign out');
+                FIREBASE_AUTH.signOut();
+                router.push('/pages/Login/login');
+              }}>
+                {({ pressed }) => (
+                  <FontAwesome name="sign-out" size={24} color={Colors[colorScheme ?? 'light'].text} style={{ marginRight: 15 }} />
+                )}
+              </Pressable>
             </View>
           ),
         }}

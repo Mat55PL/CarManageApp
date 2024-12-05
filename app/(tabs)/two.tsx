@@ -78,7 +78,7 @@ export default function TabTwoScreen() {
   if (!hasNfc) {
     return (
       <View style={styles.sectionContainer}>
-        <Text style={styles.title}>Nie wykryto modułu NFC!</Text>
+        <Text style={styles.NfcErrorText}>Nie wykryto modułu NFC!</Text>
       </View>
     );
   }
@@ -86,7 +86,7 @@ export default function TabTwoScreen() {
   if (!nfcActive) {
     return (
       <View style={styles.sectionContainer}>
-        <Text style={styles.title}>Moduł NFC jest wyłączony!</Text>
+        <Text style={styles.NfcErrorText}>Moduł NFC jest wyłączony!</Text>
       </View>
     );
   }
@@ -162,6 +162,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  NfcErrorText: {
+    color: 'red',
   },
   separator: {
     marginVertical: 30,
