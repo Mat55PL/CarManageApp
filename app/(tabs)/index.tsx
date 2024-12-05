@@ -41,9 +41,10 @@ export default function TabOneScreen() {
   const listHeader = () => (
     <View style={styles.headerContainer}>
       <Text style={styles.title}>Tab One</Text>
-      <Text>Witaj {user?.email}! 🎉</Text>
+      <Text>Witaj {user?.displayName}! 🎉</Text>
+      <Text>USER: {user?.uid}</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      {/*<EditScreenInfo path="app/(tabs)/index.tsx" /> */}
     </View>
   );
 

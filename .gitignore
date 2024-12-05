@@ -78,3 +78,5 @@ expo-env.d.ts
 android/app/my-upload-key.keystore
 /.idea
 android/gradle.properties
+.env
+/android

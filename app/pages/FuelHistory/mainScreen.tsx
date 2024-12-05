@@ -1,13 +1,19 @@
 // app/FuelHistory/[carId].tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Text, View } from "@/components/Themed";
+import { StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import FuelTankModal from '@/app/modals/FuelTankModal';
 import { IFuel } from '@/constants/Interfaces/IFuel';
-import { AddFuelHistoryForCarId, GetAllFuelHistoryForCarId } from '@/app/services/API/apiFuelService';
+import { AddFuelHistoryForCarId, DeleteFuelHistoryForCarId, GetAllFuelHistoryForCarId } from '@/app/services/API/apiFuelService';
 import FuelItem from '@/components/Fuel/FuelItem';
 import { FuelValidation } from '@/components/Fuel/FuelValidation';
-import { CarFuelType } from '@/constants/Enums/CarFuelType';
+import OptionsFuelTankModal from '@/app/modals/OptionsFuelTankModal';
+
+export const screenOptions = {
+    headerShown: true,
+    title: 'Historia Tankowania',
+};
 
 const FuelHistoryScreen: React.FC = () => {
     const params = useLocalSearchParams();
@@ -20,6 +26,10 @@ const FuelHistoryScreen: React.FC = () => {
     const [fuelAmount, setFuelAmount] = useState('');
     const [amountSpent, setAmountSpent] = useState('');
     const [odometer, setOdometer] = useState('');
+    // fuel options modal
+    const [isOptionsFuelModalVisible, setIsOptionsFuelModalVisible] = useState(false);
+    const [selectedFuelHistoryId, setSelectedFuelHistoryId] = useState<number>(0);
+
     const [loading, setLoading] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -77,7 +87,6 @@ const FuelHistoryScreen: React.FC = () => {
                 fuelAmount: parseFloat(fuelAmount), cost: parseFloat(amountSpent),
                 odometer: parseFloat(odometer), fuelType: fuelType, location: stationName, note: ''
             });
-            // add fuel to the list
             setFuelData([...fuelData, {
                 id: fuelData.length + 1,
                 carId: carId,
@@ -95,8 +104,36 @@ const FuelHistoryScreen: React.FC = () => {
         }
     };
 
+    const fuelOptions = () => {
+        console.log('Fuel options...');
+    };
+
+    const openFuelOptionsModal = (fuelId: number) => {
+        console.log('Opening fuel options modal...');
+        setSelectedFuelHistoryId(fuelId);
+        setIsOptionsFuelModalVisible(true);
+    }
+
+    const closeFuelOptionsModal = () => {
+        console.log('Closing fuel options modal...');
+        setIsOptionsFuelModalVisible(false);
+    }
+
+    const onDeleteFuelTank = async () => {
+        console.log(`Deleting fuel tank [${selectedFuelHistoryId}]`);
+        try {
+            await DeleteFuelHistoryForCarId(selectedFuelHistoryId);
+            setFuelData(fuelData.filter((item) => item.id !== selectedFuelHistoryId));
+            Alert.alert('Sukces', 'Pomyślnie usunięto zapis tankowania', [{ text: 'OK' }]);
+        } catch (error) {
+            console.error(`Error deleting fuel tank [${selectedFuelHistoryId}]`, error);
+            Alert.alert('Błąd! Sprawdź połączenie z internetem', 'Nie udało się usunąć zapisu tankowania', [{ text: 'OK' }]);
+        }
+        closeFuelOptionsModal();
+    }
+
     const renderFuelHistoryItem = ({ item }: { item: IFuel }) => (
-        <FuelItem item={item} />
+        <FuelItem item={item} openFuelOptions={openFuelOptionsModal} />
     );
 
     return (
@@ -126,6 +163,13 @@ const FuelHistoryScreen: React.FC = () => {
                 onAddFuel={fuelModalAddFuel}
                 selectedCar={undefined}
             />
+            <OptionsFuelTankModal
+                isVisible={isOptionsFuelModalVisible}
+                onClose={closeFuelOptionsModal}
+                selectedFuelHistoryId={selectedFuelHistoryId}
+                onEditFuelTank={() => console.log('Edit fuel tank')}
+                onDeleteFuelTank={onDeleteFuelTank}
+            />
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity style={styles.btnAddFuel} onPress={openFuelModal}>
                     <Text>⛽</Text>
@@ -139,7 +183,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#fff',
         paddingTop: 20
     },
     title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
