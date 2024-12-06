@@ -1,6 +1,7 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link, Redirect, router, Tabs } from 'expo-router';
 import { Pressable, View, Appearance } from 'react-native';
 
@@ -98,7 +99,7 @@ export default function TabLayout() {
         name="two"
         options={{
           title: 'Skaner NFC',
-          tabBarIcon: ({ color }) => <TabBarIcon name="wifi" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="cellphone-nfc" size={35} color={color} />,
         }}
       />
       <Tabs.Screen
