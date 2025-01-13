@@ -30,7 +30,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
-    "react-native-dotenv": "^3.4.11",
     "react-native-gifted-charts": "^1.4.47",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-nfc-manager": "^3.16.0",
