@@ -47,7 +47,7 @@ export default function Login() {
                     break;
             }
 
-            Alert.alert('Błąd', errorMessage);
+            Alert.alert('Wystąpił błąd', errorMessage);
         } finally {
             setLoading(false);
         }
