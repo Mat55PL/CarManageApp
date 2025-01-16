@@ -1,4 +1,3 @@
-// app/FuelHistory/[carId].tsx
 import React, { useEffect, useState } from 'react';
 import { Text, View } from "@/components/Themed";
 import { StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
@@ -51,7 +50,6 @@ const FuelHistoryScreen: React.FC = () => {
 
     const handleBackButton = () => {
         console.log('Back button pressed');
-        // TODO: Navigate back to the previous screen
         router.back();
     };
 
@@ -193,6 +191,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 20,
         right: 20,
+        backgroundColor: 'transparent',
     },
     emptyComponent: {
         textAlign: 'center',
