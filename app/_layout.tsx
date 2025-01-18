@@ -62,6 +62,13 @@ export default function RootLayout() {
           name='pages/Login/login'
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name='pages/Maintenance/maintenenceInfoScreen'
+          options={{
+            headerShown: true,
+            title: `Informacje o serwisach pojazdu`
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

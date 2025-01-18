@@ -99,7 +99,7 @@ export default function TabThreeScreen() {
         setIsCarOptionsModalVisible(true);
     }
 
-    const selectedCar = (!error) ? carsData.find((car) => car.id === selectedCarId) : undefined;
+    const selectedCar = (!error && carsData) ? carsData.find((car) => car.id === selectedCarId) : undefined;
 
     const handleAddFuel = () => {
         console.log('Adding fuel record for car ID:', selectedCarId);
@@ -202,8 +202,21 @@ export default function TabThreeScreen() {
         };
     }
 
+    const openMaintenanceInfoPage = (carId: number) => {
+        console.log(`Maintenance info page for car with ID: ${carId}`);
+        if (carId !== null) {
+            router.push({
+                pathname: '/pages/Maintenance/maintenenceInfoScreen',
+                params: {
+                    carId: carId.toString(),
+                },
+            });
+        };
+    }
+
     const renderItem = ({ item }: { item: ICar }) => (
-        <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions} openInfoPage={openInfoPage} />
+        <CarItem item={item} openFuelModal={openFuelModal} carOptions={carOptions}
+            openInfoPage={openInfoPage} openMaintenanceInfoPage={openMaintenanceInfoPage} />
     );
 
     return (
