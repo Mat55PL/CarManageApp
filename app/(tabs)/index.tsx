@@ -23,7 +23,7 @@ export default function TabOneScreen() {
       .then(data => setCars(data))
       .catch(error => {
         console.error('Error fetching data:', error);
-        setError('Błąd pobrania danych...');
+        setError('Błąd pobrania danych!');
       });
   }, []);
 
@@ -53,7 +53,8 @@ export default function TabOneScreen() {
       {error ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
-          <Text>Sprawdź swoje połączenie z internetem... 😥</Text>
+          <Text>Sprawdź swoje połączenie z internetem</Text>
+          <Text>ale w sumie to może być też nasza wina 😥</Text>
         </View>
       ) : null}
     </View>
