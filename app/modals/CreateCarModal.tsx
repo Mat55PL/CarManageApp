@@ -3,8 +3,8 @@ import { Text, Modal, View, KeyboardAvoidingView, Platform, TextInput, Touchable
 import { Select, SelectModalProvider, SelectProvider } from '@mobile-reality/react-native-select-pro';
 import { ICreateCarModalProps } from "@/constants/Interfaces/ICreateCarModalProps";
 import { getCarsBrands, getCarsModels } from "../services/Files/fileSystem";
-import { CarFuelType } from "@/constants/Enums/CarFuelType";
-import { CarTyreType } from "@/constants/Enums/CarTyreType";
+import { CarFuelType, FuelTypeNames } from "@/constants/Enums/CarFuelType";
+import { CarTyreType, CarTyreTypeNames } from "@/constants/Enums/CarTyreType";
 
 const CreateCarModal: React.FC<ICreateCarModalProps> = ({
     isVisible, onClose, onAddCar, brand, setBrand, model, setModel, vin, setVin,
@@ -120,14 +120,20 @@ const CreateCarModal: React.FC<ICreateCarModalProps> = ({
 
                                             <Text style={styles.subtitle}>Rodzaj paliwa</Text>
                                             <Select
-                                                options={Object.keys(CarFuelType).map(fuelType => ({ label: fuelType, value: fuelType }))}
+                                                options={Object.entries(FuelTypeNames).map(([value, label]) => ({
+                                                    label: label,
+                                                    value: value
+                                                }))}
                                                 placeholderText="Wybierz rodzaj paliwa..."
                                                 onSelect={(option) => setFuelType(Number(option.value))}
                                             />
 
                                             <Text style={styles.subtitle}>Rodzaj opon</Text>
                                             <Select
-                                                options={Object.keys(CarTyreType).map(wheelType => ({ label: wheelType, value: wheelType }))}
+                                                options={Object.entries(CarTyreTypeNames).map(([value, label]) => ({
+                                                    label: label,
+                                                    value: value
+                                                }))}
                                                 placeholderText="Wybierz rodzaj opon..."
                                                 onSelect={(option) => setWheelType(Number(option.value))}
                                             />

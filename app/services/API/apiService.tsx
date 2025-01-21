@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import { ICreateCar } from "@/constants/Interfaces/ICreateCar";
+
 const CARS_API_URL = 'https://mattu.bieda.it/api/car';
-const CARS_FUEL_HISTORY_API_URL = 'https://mattu.bieda.it/api/CarFuelHistory';
 
 export async function getAllCars() {
     try {
@@ -35,7 +35,7 @@ export async function addCar(car: ICreateCar) {
         const responseBody = await response.text();
 
         if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`);
+            console.error(`HTTP error! status: ${response.status} | body: ${responseBody}`);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
