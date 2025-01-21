@@ -9,7 +9,7 @@ export enum CarFuelType {
     Inny = 7,
 };
 
-const FuelTypeNames = {
+export const FuelTypeNames = {
     [CarFuelType.Benzyna]: 'Benzyna',
     [CarFuelType.Diesel]: 'Diesel',
     [CarFuelType.Elektryczny]: 'Elektryczny',

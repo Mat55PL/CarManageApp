@@ -5,7 +5,7 @@ export enum CarTyreType {
     Inne
 };
 
-const CarTyreTypeNames = {
+export const CarTyreTypeNames = {
     [CarTyreType.Letnie]: 'Letnie',
     [CarTyreType.Zimowe]: 'Zimowe',
     [CarTyreType.Całoroczne]: 'Całoroczne',
