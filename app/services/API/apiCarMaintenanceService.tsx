@@ -1,7 +1,6 @@
 import { CreateMaintenanceItem, CreateMaintenanceRecord } from "@/constants/Interfaces/ICreateMaintenanceRecord";
 import { Alert } from "react-native";
 
-
 const CAR_MAINTENANCE_API_URL = 'https://mattu.bieda.it/api/CarMaintenance';
 
 export async function GetAllCarMaintenanceForCarId(carId: number) {

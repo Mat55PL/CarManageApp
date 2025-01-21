@@ -1,5 +1,6 @@
+import CreateMaintenanceItemModal from '@/app/modals/CreateMaintenanceItemModal';
 import CreateMaintenanceModal from '@/app/modals/CreateMaintenanceModal';
-import { AddCarMaintenance, GetAllCarMaintenanceForCarId } from '@/app/services/API/apiCarMaintenanceService';
+import { AddCarMaintenance, AddCarMaintenanceItem, GetAllCarMaintenanceForCarId } from '@/app/services/API/apiCarMaintenanceService';
 import renderMaintenanceItems from '@/components/Maintenance/maintenanceItem';
 import { View, Text } from '@/components/Themed';
 import { MaintenanceRecord, MaintenanceItem } from '@/constants/Interfaces/IMaintenence';
@@ -14,11 +15,19 @@ const MaintenanceInfoScreen: React.FC = () => {
     const [maintenanceData, setMaintenanceData] = useState<MaintenanceRecord[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [expandedRecords, setExpandedRecords] = useState<{ [key: number]: boolean }>({});
+    // new maintenance record modal
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    // new maintenance item modal
+    const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
     // new maintenance record
     const [maintenanceDate, setMaintenanceDate] = useState<string>('');
     const [description, setDescription] = useState<string>('');
-
+    // new maintenance item
+    const [partName, setPartName] = useState<string>('');
+    const [cost, setCost] = useState<string>('0');
+    const [maintenanceItemId, setMaintenanceItemId] = useState<string>('');
+    const [descriptionItem, setDescriptionItem] = useState<string>('');
+    const [maintenanceRecordId, setMaintenanceRecordId] = useState<Number>(0);
 
     const getData = async () => {
         if (carId == null) {
@@ -45,8 +54,10 @@ const MaintenanceInfoScreen: React.FC = () => {
         }));
     };
 
-    const handleAddMaintenanceItem = (recordId: Number) => {
+    const showAddMaintenanceItemModal = (recordId: Number) => {
         console.log(`Add maintenance item for record with ID: ${recordId}`);
+        setMaintenanceRecordId(recordId);
+        setIsAddItemModalVisible(true);
     };
 
     const showAddMaintenanceRecordModal = () => {
@@ -58,7 +69,7 @@ const MaintenanceInfoScreen: React.FC = () => {
         return date.split('T')[0];
     };
 
-    const sendToAPI = async () => {
+    const sendNewRecordToAPI = async () => {
         console.log(`[SendToAPI] Adding maintenance record for car with ID: ${carId}`);
         let onlyDate = convertToDateOnly(maintenanceDate);
         if (carId !== null) {
@@ -75,11 +86,34 @@ const MaintenanceInfoScreen: React.FC = () => {
         }
     };
 
+    const sendNewItemToAPI = async () => {
+        console.log(`[SendToAPI] Adding maintenance item for record with ID: ${maintenanceRecordId}`);
+        if (maintenanceRecordId !== 0) {
+            await AddCarMaintenanceItem({
+                maintenanceId: Number(maintenanceRecordId),
+                partName: partName,
+                cost: Number(cost),
+                description: descriptionItem,
+            });
+            getData();
+        } else {
+            setError("Maintenance ID is null");
+            return;
+        }
+    };
+
     const handleAddMaintenanceRecord = () => {
         console.log(`Adding maintenance record for car with ID: ${carId}`);
         console.log(`Data to add: ${maintenanceDate}, ${description}`);
         setIsAddModalVisible(false);
-        sendToAPI();
+        sendNewRecordToAPI();
+    };
+
+    const handleAddMaintenanceItem = () => {
+        console.log(`Adding maintenance item for record with ID: ${maintenanceItemId}`);
+        console.log(`Data to add: ${partName}, ${cost}, ${descriptionItem}`);
+        setIsAddItemModalVisible(false);
+        sendNewItemToAPI();
     };
 
     const renderMaintenanceRecords = () => {
@@ -108,7 +142,7 @@ const MaintenanceInfoScreen: React.FC = () => {
 
                 <TouchableOpacity
                     style={styles.addButton}
-                    onPress={() => handleAddMaintenanceItem(record.id)}
+                    onPress={() => showAddMaintenanceItemModal(record.id)}
                 >
                     <Text style={styles.addButtonText}>+ Dodaj nowy przedmiot naprawy</Text>
                 </TouchableOpacity>
@@ -147,6 +181,19 @@ const MaintenanceInfoScreen: React.FC = () => {
                 setMaintenanceDate={setMaintenanceDate}
                 description={description}
                 setDescription={setDescription}
+            />
+
+            <CreateMaintenanceItemModal
+                isVisable={isAddItemModalVisible}
+                onClose={() => setIsAddItemModalVisible(false)}
+                onAddMaintenanceItem={() => handleAddMaintenanceItem()}
+                maintenanceItemId={''}
+                partName={partName}
+                setPartName={setPartName}
+                description={descriptionItem}
+                setDescription={setDescriptionItem}
+                cost={cost}
+                setCost={setCost}
             />
         </View>
     );

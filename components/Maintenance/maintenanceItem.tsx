@@ -1,6 +1,7 @@
 import { MaintenanceItem } from "@/constants/Interfaces/IMaintenence";
 import { View, Text } from "../Themed";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const renderMaintenanceItems = (recordId: number, items: MaintenanceItem[]) => {
     const totalCost = items.reduce((sum, item) => sum + item.cost, 0);
@@ -14,7 +15,20 @@ const renderMaintenanceItems = (recordId: number, items: MaintenanceItem[]) => {
                 >
                     <Text style={styles.maintenanceItemTitle}>{item.partName}</Text>
                     <Text style={styles.maintenanceItemDescription}>{item.description}</Text>
-                    <Text style={styles.maintenanceItemCost}>Kwota: {item.cost.toFixed(2)} PLN</Text>
+                    <View style={styles.bottomRow}>
+                        <Text style={styles.maintenanceItemCost}>Kwota: {item.cost.toFixed(2)} PLN</Text>
+                        <View style={styles.buttonsContainer}>
+                            <TouchableOpacity style={styles.btn}
+                                onPress={() => {
+                                    console.log('Edit maintenance item');
+                                }}>
+                                <Text style={styles.btnText}><FontAwesome name="edit" size={24} color="black" /></Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.btn}>
+                                <Text style={styles.btnText}><FontAwesome name="trash-o" size={24} color="black" /></Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
             ))}
             <View style={styles.totalCostContainer}>
@@ -59,6 +73,23 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#4CAF50',
     },
+    bottomRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: 'transparent',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        gap: 10,
+        backgroundColor: 'transparent',
+    },
+    btn: {
+        padding: 2,
+    },
+    btnText: {
+        color: '#fff',
+    }
 });
 
 
