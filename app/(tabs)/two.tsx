@@ -1,15 +1,28 @@
-import NfcManager, { NfcTech } from 'react-native-nfc-manager';
-import { AppState, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import NfcManager, { Ndef, NfcTech } from 'react-native-nfc-manager';
+import {
+  AppState,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+  Modal,
+  TextInput,
+  ScrollView
+} from 'react-native';
 import { SetStateAction, useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
 
+type TagType = 'fuel' | 'service' | null;
 
 export default function TabTwoScreen() {
-
-  const [hasNfc, setHasNfc] = useState<boolean | null>(null); // is device has NFC supported
-  const [nfcActive, setNfcActive] = useState<boolean>(false); // is NFC enabled on device
-  const [isScanning, setIsScanning] = useState<boolean>(false); // is NFC scanning in progress
+  const [hasNfc, setHasNfc] = useState<boolean | null>(null);
+  const [nfcActive, setNfcActive] = useState<boolean>(false);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
   const [appState, setAppState] = useState<string>(AppState.currentState);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedType, setSelectedType] = useState<TagType>(null);
+  const [vehicleId, setVehicleId] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   const checkIsNfcActive = async () => {
     try {
@@ -91,61 +104,178 @@ export default function TabTwoScreen() {
     );
   }
 
+  const handleSaveTag = async () => {
+    if (!vehicleId) {
+      setError('Proszę wprowadzić ID pojazdu');
+      return;
+    }
+    if (!selectedType) {
+      setError('Proszę wybrać typ tagu');
+      return;
+    }
+
+    const tagData = {
+      vehicleId,
+      type: selectedType,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      await saveDataToTag(tagData);
+      setShowModal(false);
+      setSelectedType(null);
+      setVehicleId('');
+      setError('');
+    } catch (error) {
+      console.error('Error saving tag:', error);
+      Alert.alert('Błąd', 'Nie udało się zapisać tagu');
+    }
+  };
+
+  const saveDataToTag = async (data: any) => {
+    const message = [
+      Ndef.textRecord(JSON.stringify(data)),
+    ];
+
+    try {
+      await NfcManager.requestTechnology(NfcTech.Ndef);
+      const bytes = Ndef.encodeMessage(message);
+
+      if (bytes) {
+        await NfcManager.ndefHandler.writeNdefMessage(bytes);
+        Alert.alert('Sukces', `Tag został zapisany dla pojazdu ${data.vehicleId} jako ${data.type}`);
+      }
+    } finally {
+      await NfcManager.cancelTechnologyRequest();
+    }
+  };
+
   const readTag = async () => {
-    console.log('Trying to read tag');
     setIsScanning(true);
     try {
       await NfcManager.requestTechnology(NfcTech.Ndef);
       const tag = await NfcManager.getTag();
 
-      if (tag) {
-        console.log(`Tag data: ${JSON.stringify(tag)}`);
-        Alert.alert('Tag Data', JSON.stringify(tag));
-      } else {
-        console.warn('No tag detected');
-        Alert.alert('Error', 'No tag detected.');
+      if (tag?.ndefMessage?.[0]) {
+        const ndefMessage = tag.ndefMessage[0];
+        const tagData = JSON.parse(Ndef.text.decodePayload(new Uint8Array(ndefMessage.payload)));
+        Alert.alert(
+          'Odczytano tag',
+          `Typ: ${tagData.type}\nPojazd ID: ${tagData.vehicleId}\nData: ${new Date(tagData.timestamp).toLocaleString()}`
+        );
       }
     } catch (ex) {
-      console.warn('Error reading tag', ex);
+      console.warn('Error reading tag:', ex);
+      Alert.alert('Błąd', 'Nie udało się odczytać tagu');
     } finally {
-      try {
-        await NfcManager.cancelTechnologyRequest();
-      } catch (error) {
-        console.warn('Error cancelling technology request', error);
-      }
+      await NfcManager.cancelTechnologyRequest();
       setIsScanning(false);
     }
   };
 
-  const cancelReadTag = async () => {
-    try {
-      await NfcManager.cancelTechnologyRequest();
-      console.log('Tag read cancelled');
-    } catch (error) {
-      console.error('Error cancelling tag read:', error);
-    } finally {
-      setIsScanning(false);
-    }
-  };
+  if (hasNfc === null) return null;
+  if (!hasNfc) return <ErrorView message="Nie wykryto modułu NFC!" />;
+  if (!nfcActive) return <ErrorView message="Moduł NFC jest wyłączony!" />;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
+      <Text style={styles.title}>Zarządzanie NFC</Text>
       <View style={styles.separator} />
-      <Text style={styles.nfc_title}>NFC</Text>
-      <SafeAreaView style={styles.sectionContainer}>
-        <Text>Hello world</Text>
-        <TouchableOpacity style={[styles.btn, styles.btnScan]} onPress={readTag}>
-          <Text style={{ color: 'white' }}>Scan Tag</Text>
+
+      <SafeAreaView style={styles.content}>
+        <TouchableOpacity
+          style={[styles.button, styles.buttonPrimary]}
+          onPress={() => setShowModal(true)}
+        >
+          <Text style={styles.buttonText}>Zapisz nowy tag</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.buttonSecondary]}
+          onPress={readTag}
+        >
+          <Text style={styles.buttonText}>Odczytaj tag</Text>
         </TouchableOpacity>
       </SafeAreaView>
+
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Nowy tag NFC</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="ID pojazdu"
+              value={vehicleId}
+              onChangeText={setVehicleId}
+              keyboardType="numeric"
+            />
+
+            <Text style={styles.label}>Wybierz typ tagu:</Text>
+            <View style={styles.typeButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  selectedType === 'fuel' && styles.typeButtonSelected
+                ]}
+                onPress={() => setSelectedType('fuel')}
+              >
+                <Text style={styles.typeButtonText}>Tankowanie</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  selectedType === 'service' && styles.typeButtonSelected
+                ]}
+                onPress={() => setSelectedType('service')}
+              >
+                <Text style={styles.typeButtonText}>Serwis</Text>
+              </TouchableOpacity>
+            </View>
+
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonCancel]}
+                onPress={() => {
+                  setShowModal(false);
+                  setError('');
+                  setSelectedType(null);
+                  setVehicleId('');
+                }}
+              >
+                <Text style={styles.buttonText}>Anuluj</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.buttonConfirm]}
+                onPress={handleSaveTag}
+              >
+                <Text style={styles.buttonText}>Zapisz</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {isScanning && (
         <View style={styles.overlay}>
           <View style={styles.scanningPanel}>
-            <Text style={styles.scanningText}>Trwa wyszukiwanie tagu NFC...</Text>
-            <TouchableOpacity style={[styles.btn, styles.btnCancel]} onPress={cancelReadTag}>
-              <Text style={{ color: 'white' }}>Anuluj</Text>
+            <Text style={styles.scanningText}>Przyłóż tag NFC...</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonCancel]}
+              onPress={() => {
+                NfcManager.cancelTechnologyRequest();
+                setIsScanning(false);
+              }}
+            >
+              <Text style={styles.buttonText}>Anuluj</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -154,66 +284,168 @@ export default function TabTwoScreen() {
   );
 }
 
+const ErrorView = ({ message }: { message: string }) => (
+  <View style={styles.errorContainer}>
+    <Text style={styles.errorText}>{message}</Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  content: {
+    width: '100%',
+    padding: 20,
   },
-  NfcErrorText: {
-    color: 'red',
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 20,
   },
   separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-    backgroundColor: '#eee',
-  },
-  nfc_title: {
-    fontSize: 20,
-    fontWeight: 'bold',
     marginVertical: 20,
+    height: 1,
+    width: '90%',
+    backgroundColor: '#ddd',
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  btn: {
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
+  button: {
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 8,
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  btnScan: {
-    backgroundColor: 'green',
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
-  btnCancel: {
-    backgroundColor: 'red',
+  buttonPrimary: {
+    backgroundColor: '#2196F3',
+  },
+  buttonSecondary: {
+    backgroundColor: '#4CAF50',
+  },
+  buttonCancel: {
+    backgroundColor: '#f44336',
+    flex: 1,
+    marginRight: 8,
+  },
+  buttonConfirm: {
+    backgroundColor: '#4CAF50',
+    flex: 1,
+    marginLeft: 8,
   },
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   scanningPanel: {
-    width: '80%',
     backgroundColor: 'white',
-    borderRadius: 10,
     padding: 20,
+    borderRadius: 15,
+    width: '80%',
     alignItems: 'center',
-    opacity: 0.6,
   },
   scanningText: {
     fontSize: 18,
     marginBottom: 20,
-    color: 'black',
+    color: '#333',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#666',
+  },
+  typeButtons: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  typeButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  typeButtonSelected: {
+    backgroundColor: '#e3f2fd',
+    borderColor: '#2196F3',
+  },
+  typeButtonText: {
+    color: '#333',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+    marginTop: 20,
+  },
+  sectionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  NfcErrorText: {
+    color: '#f44336',
+    fontSize: 16,
+    marginVertical: 10,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#f44336',
+    fontSize: 16,
+    marginVertical: 10,
+    textAlign: 'center',
   },
 });
