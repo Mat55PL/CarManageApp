@@ -66,3 +66,29 @@ export async function deleteCar(carId: number) {
         console.log(`Error: ${error}`);
     }
 }
+
+export async function updateCurrentCarUser(carId: number, userId: string) {
+    // example update url: https://mattu.bieda.it/api/car/{carId}/current-user
+    console.log(`Updating car with ID: ${carId} to user with ID: ${userId}`);
+    try {
+        const response = await fetch(`${CARS_API_URL}/${carId}/current-user`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userId),
+        });
+
+        const responseBody = await response.text();
+
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log(`Response: ${responseBody}`);
+    } catch (error: any) {
+        Alert.alert("Wystąpił błąd", `Nie udało się zaktualizować pojazdu. Sprawdź połączenie z internetem. ${error.message}`, [{ text: "OK" }]);
+        console.log(`[updateCurrentCarUser:ERROR] ${error}`);
+    }
+};

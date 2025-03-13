@@ -11,8 +11,11 @@ import {
 } from 'react-native';
 import { SetStateAction, useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
+import FuelTankModal from '../modals/FuelTankModal';
+import { updateCurrentCarUser } from '../services/API/apiService';
+import { FIREBASE_AUTH } from '@/FirebaseConfig';
 
-type TagType = 'fuel' | 'service' | null;
+type TagType = 'fuel' | 'service' | 'setCurrentCarUser' | null;
 
 export default function TabTwoScreen() {
   const [hasNfc, setHasNfc] = useState<boolean | null>(null);
@@ -23,6 +26,8 @@ export default function TabTwoScreen() {
   const [selectedType, setSelectedType] = useState<TagType>(null);
   const [vehicleId, setVehicleId] = useState<string>('');
   const [error, setError] = useState<string>('');
+
+  let USER = FIREBASE_AUTH.currentUser;
 
   const checkIsNfcActive = async () => {
     try {
@@ -114,6 +119,9 @@ export default function TabTwoScreen() {
       return;
     }
 
+    // Ustawiamy "tryb skanowania" na true -> pokaże się overlay
+    setIsScanning(true);
+
     const tagData = {
       vehicleId,
       type: selectedType,
@@ -121,14 +129,23 @@ export default function TabTwoScreen() {
     };
 
     try {
+      // Próba zapisu do tagu
       await saveDataToTag(tagData);
+
+      // Po pomyślnym zapisie zamykamy modal i czyścimy stany
+      Alert.alert('Sukces', `Tag został zapisany dla pojazdu ${tagData.vehicleId} jako ${tagData.type}`);
+    } catch (error) {
+      console.error('Error saving tag:', error);
+      Alert.alert('Błąd', 'Nie udało się zapisać tagu');
+    } finally {
+      // Niezależnie od wyniku, kończymy tryb skanowania
+      setIsScanning(false);
+
+      // Czyścimy dane formularza
       setShowModal(false);
       setSelectedType(null);
       setVehicleId('');
       setError('');
-    } catch (error) {
-      console.error('Error saving tag:', error);
-      Alert.alert('Błąd', 'Nie udało się zapisać tagu');
     }
   };
 
@@ -159,10 +176,14 @@ export default function TabTwoScreen() {
       if (tag?.ndefMessage?.[0]) {
         const ndefMessage = tag.ndefMessage[0];
         const tagData = JSON.parse(Ndef.text.decodePayload(new Uint8Array(ndefMessage.payload)));
+        await processNfcTag(tagData);
+        console.log('Odczytano Tag data:', tagData);
+        /*
         Alert.alert(
           'Odczytano tag',
           `Typ: ${tagData.type}\nPojazd ID: ${tagData.vehicleId}\nData: ${new Date(tagData.timestamp).toLocaleString()}`
         );
+        */
       }
     } catch (ex) {
       console.warn('Error reading tag:', ex);
@@ -170,6 +191,43 @@ export default function TabTwoScreen() {
     } finally {
       await NfcManager.cancelTechnologyRequest();
       setIsScanning(false);
+    }
+  };
+
+  const setNewUser = async (tagData: any) => {
+    console.log('[setNewUser] Tag data:', tagData);
+    try {
+      if (USER) {
+        await updateCurrentCarUser(tagData.vehicleId, USER.uid);
+      } else {
+        console.error('User is not authenticated');
+        Alert.alert('Błąd', 'Użytkownik nie jest zalogowany');
+      }
+      Alert.alert('Sukces', 'Pojazd został przypisany do Ciebie');
+    }
+    catch (error) {
+      console.error('Error setting new user:', error);
+      Alert.alert('Błąd', 'Nie udało się przypisać pojazdu');
+    }
+  };
+
+  const processNfcTag = async (tagData: any) => {
+    console.log('[processNFCTAG] Tag data:', tagData);
+    if (tagData.type === 'fuel') {
+      console.log('Fuel tag detected');
+      // Open fuel tank modal
+    } else if (tagData.type === 'service') {
+      console.log('Service tag detected');
+      // Open service modal
+    } else if (tagData.type === 'setCurrentCarUser') {
+      console.log('Set current car user tag detected');
+      // alert czy na pewno chcesz przypisać pojazd do siebie?
+      Alert.alert(
+        'Przejęcie pojazdu', 'Czy na pewno chcesz przypisać ten pojazd do siebie?',
+        [{ text: 'Tak', onPress: () => setNewUser(tagData) },
+        { text: 'Nie', onPress: () => console.log('Anulowano przypisanie pojazdu') }
+        ]
+      );
     }
   };
 
@@ -236,6 +294,16 @@ export default function TabTwoScreen() {
               >
                 <Text style={styles.typeButtonText}>Serwis</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  selectedType === 'setCurrentCarUser' && styles.typeButtonSelected
+                ]}
+                onPress={() => setSelectedType('setCurrentCarUser')}
+              >
+                <Text style={styles.typeButtonText}>Przejęcie pojazdu</Text>
+              </TouchableOpacity>
             </View>
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -280,6 +348,19 @@ export default function TabTwoScreen() {
           </View>
         </View>
       )}
+      <FuelTankModal
+        isVisible={false}
+        onClose={() => { }}
+        onAddFuel={() => { }}
+        stationName='Orlen' setStationName={function (text: string): void {
+          throw new Error('Function not implemented.');
+        }} fuelAmount={''} setFuelAmount={function (text: string): void {
+          throw new Error('Function not implemented.');
+        }} amountSpent={''} setAmountSpent={function (text: string): void {
+          throw new Error('Function not implemented.');
+        }} odometer={''} setOdometer={function (text: string): void {
+          throw new Error('Function not implemented.');
+        }} selectedCar={undefined} />
     </View>
   );
 }
@@ -302,7 +383,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ddd',
     marginTop: 20,
   },
   separator: {
@@ -397,16 +478,17 @@ const styles = StyleSheet.create({
   typeButtons: {
     backgroundColor: 'transparent',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
   typeButton: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: '30%',
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    marginHorizontal: 5,
+    margin: 5,
     alignItems: 'center',
   },
   typeButtonSelected: {
@@ -417,6 +499,7 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 14,
     fontWeight: '500',
+    textAlign: 'center',
   },
   modalButtons: {
     flexDirection: 'row',
