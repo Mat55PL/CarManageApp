@@ -55,18 +55,6 @@ Projekt ma na celu:
 - Usprawnienie procesów administracyjnych
 - Wsparcie zarówno firm, jak i użytkowników prywatnych
 
-## 📦 Instalacja
-
-[Instrukcje instalacji zostaną dodane wkrótce]
-
-## 🚀 Rozpoczęcie Pracy
-
-[Instrukcje uruchomienia zostaną dodane wkrótce]
-
-## 📄 Licencja
-
-[Informacje o licencji zostaną dodane wkrótce]
-
 ---
 
 <div align="center">
